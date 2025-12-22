@@ -5,6 +5,23 @@
  * NO DOM MANIPULATION
  */
 
+// Polyfill for String.padStart for older browsers
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength, padString) {
+        targetLength = targetLength >> 0; //truncate if number, or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length >= targetLength) {
+            return String(this);
+        } else {
+            targetLength = targetLength - this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength / padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0, targetLength) + String(this);
+        }
+    };
+}
+
 const DataManager = {
     
     // Storage keys
@@ -162,14 +179,25 @@ const DataManager = {
      */
     getTodaysBirthdays() {
         const today = new Date();
-        const todayStr = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        const day = today.getDate();
+        const month = today.getMonth() + 1;
+        
+        // Format with leading zeros manually (instead of padStart)
+        const dayStr = day < 10 ? '0' + day : '' + day;
+        const monthStr = month < 10 ? '0' + month : '' + month;
+        const todayStr = `${dayStr}-${monthStr}`;
+        
         const birthdates = this.getBirthdates();
         return Object.keys(birthdates).filter(name => {
             const bd = birthdates[name];
-            if (bd.length === 10) { // YYYY-MM-DD
-                const [, month, day] = bd.split('-');
-                return `${day}-${month}` === todayStr;
-            } else if (bd.length === 5) { // DD-MM
+            if (!bd) return false;
+            
+            if (bd.length === 10) { // YYYY-MM-DD format
+                const parts = bd.split('-');
+                const bdDay = parts[2];
+                const bdMonth = parts[1];
+                return `${bdDay}-${bdMonth}` === todayStr;
+            } else if (bd.length === 5) { // DD-MM format
                 return bd === todayStr;
             }
             return false;
