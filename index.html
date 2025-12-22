@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tribe Vibe - TribeStays Fun Games</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>🎉 Tribe Vibe</h1>
+            <p class="tagline">Where TribeStays vibes meet chaos</p>
+            <div class="header-controls">
+                <button id="themeToggle" class="icon-btn" title="Toggle theme">🌙</button>
+                <button id="soundToggle" class="icon-btn" title="Toggle sound">🔊</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Name Management Section -->
+            <section class="card">
+                <h2>👥 Manage Your Tribe</h2>
+                
+                <!-- Bulk Entry -->
+                <div class="input-group">
+                    <label for="bulkNames">Add Multiple Names (one per line):</label>
+                    <textarea id="bulkNames" rows="4" placeholder="Rohan&#10;Priya&#10;Karan"></textarea>
+                    <button id="addBulkBtn" class="btn btn-primary">Add All Names</button>
+                </div>
+
+                <!-- Single Entry -->
+                <div class="input-group">
+                    <label for="singleName">Or Add One at a Time:</label>
+                    <div class="flex-row">
+                        <input type="text" id="singleName" placeholder="Enter name">
+                        <input type="date" id="birthdate" placeholder="Date of Birth (optional)">
+                        <button id="addSingleBtn" class="btn btn-secondary">Add</button>
+                    </div>
+                </div>
+
+                <!-- Names List -->
+                <div class="names-container">
+                    <h3>Current Members:</h3>
+                    <div id="namesList" class="scrollable-list"></div>
+                    <div class="btn-group">
+                        <button id="saveNamesBtn" class="btn btn-success">💾 Save</button>
+                        <button id="clearNamesBtn" class="btn btn-danger">🗑️ Clear All</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task Management Section -->
+            <section class="card">
+                <h2>📝 Fun Tasks Pool</h2>
+                <div class="input-group">
+                    <textarea id="taskInput" rows="4" placeholder="Add tasks (one per line)&#10;Do a 10-second dance&#10;Tell a joke"></textarea>
+                    <button id="saveTasksBtn" class="btn btn-primary">Save Tasks</button>
+                </div>
+                <div class="tasks-container">
+                    <h3>Available Tasks:</h3>
+                    <div class="select-all">
+                        <label>
+                            <input type="checkbox" id="selectAllTasks"> Select All
+                        </label>
+                    </div>
+                    <div id="tasksList" class="tasks-list"></div>
+                </div>
+            </section>
+
+            <!-- History Panel -->
+            <section class="card">
+                <h2>📜 Recent History</h2>
+                <div id="historyList" class="history-list"></div>
+                <button id="clearHistoryBtn" class="btn btn-danger">Clear History</button>
+            </section>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Game Buttons Section -->
+            <section class="card">
+                <h2>🎮 Pick Your Game</h2>
+                <div class="game-grid">
+                    <button class="game-btn" id="randomPersonBtn">
+                        <span class="emoji">🎯</span>
+                        <span>Random Person & Task</span>
+                    </button>
+                    <button class="game-btn" id="shufflePairsBtn">
+                        <span class="emoji">👥</span>
+                        <span>Shuffle Pairs</span>
+                    </button>
+                    <button class="game-btn" id="chaosTeamsBtn">
+                        <span class="emoji">🔀</span>
+                        <span>Chaos Teams</span>
+                    </button>
+                    <button class="game-btn" id="mostLikelyBtn">
+                        <span class="emoji">🤔</span>
+                        <span>Most Likely To</span>
+                    </button>
+                    <button class="game-btn" id="roleRouletteBtn">
+                        <span class="emoji">🎭</span>
+                        <span>Role Roulette</span>
+                    </button>
+                    <button class="game-btn" id="secretSantaBtn">
+                        <span class="emoji">🎅</span>
+                        <span>Secret Santa</span>
+                    </button>
+                    <button class="game-btn" id="birthdayCheckBtn">
+                        <span class="emoji">🎂</span>
+                        <span>Birthday Check</span>
+                    </button>
+                    <button class="game-btn chaos" id="chaosBtn">
+                        <span class="emoji">💥</span>
+                        <span>CHAOS BUTTON</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Result Display Section -->
+            <section class="card result-card" id="resultCard" style="display: none;">
+                <h2>🎊 Result</h2>
+                <div id="resultContent" class="result-content"></div>
+                <div class="btn-group">
+                    <button id="rerunBtn" class="btn btn-secondary">🔄 Re-run</button>
+                    <button id="copyBtn" class="btn btn-primary">📋 Copy</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Confetti Container -->
+    <div id="confetti" class="confetti-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/dataManager.js"></script>
+    <script src="js/gameEngine.js"></script>
+    <script src="js/uiController.js"></script>
+</body>
+</html>
