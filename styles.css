@@ -28,6 +28,11 @@ body.dark-mode {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 16px;
 }
 
 body {
@@ -36,62 +41,246 @@ body {
     color: var(--text);
     line-height: 1.6;
     transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
 }
 
 /* Container */
 .container {
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
+    position: relative;
+}
+
+/* Responsive Breakpoints */
+:root {
+    --spacing-xs: 8px;
+    --spacing-sm: 12px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    
+    --header-height: 60px;
 }
 
 /* App Layout */
 .app-container {
     display: flex;
-    gap: 30px;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
+    padding: var(--spacing-md);
 }
 
 .sidebar {
-    flex: 0 0 350px;
-    min-width: 300px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .main-content {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
+}
+
+/* Responsive Sidebar Toggle */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Header */
+header {
+    position: relative;
+    padding: var(--spacing-lg) 0;
+    min-height: var(--header-height);
+}
+
+.header-controls {
+    position: absolute;
+    top: 50%;
+    right: var(--spacing-md);
+    transform: translateY(-50%);
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+    
+    .app-container {
+        padding: var(--spacing-sm);
+    }
+    
+    .card {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+        border-radius: var(--border-radius-md);
+    }
+    
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100vh;
+        overflow-y: auto;
+        z-index: 900;
+        background: var(--card-bg);
+        padding: var(--spacing-lg);
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar.active {
+        transform: translateX(100%);
+    }
+    
+    .main-content {
+        margin-top: var(--header-height);
+    }
+    
+    .game-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .game-btn {
+        padding: var(--spacing-md);
+        font-size: 0.9rem;
+    }
+    
+    .game-btn .emoji {
+        font-size: 1.8rem;
+    }
+    
+    .flex-row {
+        flex-direction: column;
+    }
+    
+    .flex-row input,
+    .flex-row button {
+        width: 100%;
+    }
+}
+
+/* Smaller mobile devices */
+@media (max-width: 480px) {
+    .game-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
+        padding: 0 var(--spacing-lg);
+    }
+    
+    .header .tagline {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+/* Larger screens */
+@media (min-width: 769px) {
+    .app-container {
+        flex-direction: row;
+    }
+    
+    .sidebar {
+        flex: 0 0 350px;
+        max-width: 350px;
+        position: sticky;
+        top: var(--spacing-lg);
+        max-height: calc(100vh - var(--spacing-lg) * 2);
+        overflow-y: auto;
+    }
+    
+    .main-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .menu-toggle {
+        display: none;
+    }
 }
 
 /* Header */
 header {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
-    padding: 30px 0;
+    padding: var(--spacing-lg) 0;
     text-align: center;
     box-shadow: 0 4px 6px var(--shadow);
-    margin-bottom: 30px;
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    z-index: 100;
 }
 
 header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 5px;
+    font-size: 2rem;
+    margin: 0 auto 5px;
+    max-width: 80%;
+    line-height: 1.2;
 }
 
 .tagline {
-    font-size: 1rem;
+    font-size: 0.95rem;
     opacity: 0.9;
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
 }
 
-.header-controls {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 10px;
+@media (min-width: 768px) {
+    header h1 {
+        font-size: 2.5rem;
+    }
+    
+    .tagline {
+        font-size: 1rem;
+    }
 }
 
+/* Icon Button */
 .icon-btn {
     background: rgba(255, 255, 255, 0.2);
     border: none;
@@ -110,106 +299,153 @@ header h1 {
 /* Card Styles */
 .card {
     background: var(--card-bg);
-    border-radius: 16px;
-    padding: 25px;
-    margin-bottom: 25px;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
     box-shadow: 0 4px 12px var(--shadow);
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .card h2 {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-lg);
     color: var(--primary);
+    font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .card {
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+        border-radius: var(--border-radius-md);
+    }
+    
+    .card h2 {
+        font-size: 1.3rem;
+        margin-bottom: var(--spacing-md);
+    }
 }
 
 /* Input Groups */
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-lg);
 }
 
 .input-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-xs);
     font-weight: 600;
+    font-size: 0.95rem;
 }
 
 input[type="text"],
 input[type="date"],
 textarea {
     width: 100%;
-    padding: 12px;
+    padding: var(--spacing-sm) var(--spacing-md);
     border: 2px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
     font-size: 1rem;
     background: var(--bg);
     color: var(--text);
-    transition: border 0.3s;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
-input[type="text"]:focus,
-input[type="date"]:focus,
-textarea:focus {
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Improve touch targets on mobile */
+input[type="checkbox"],
+input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-right: var(--spacing-xs);
+}
+
+input[type="date"] {
+    padding-right: var(--spacing-sm);
+}
+
+/* Focus styles */
+input:focus,
+textarea:focus,
+select:focus {
     outline: none;
     border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
 }
 
-.flex-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+/* Placeholder text */
+::placeholder {
+    color: var(--text);
+    opacity: 0.6;
 }
 
-.flex-row input {
-    flex: 1;
-    min-width: 150px;
+/* Fix for iOS zoom on input */
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
 }
 
 /* Buttons */
 .btn {
-    padding: 12px 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-lg);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 10px;
+    transition: all 0.2s ease;
+    margin-top: var(--spacing-xs);
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.btn-primary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-secondary {
-    background: var(--secondary);
-    color: white;
-}
-
-.btn-success {
-    background: var(--success);
-    color: white;
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: white;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px var(--shadow);
-}
-
+/* Button states */
 .btn:active {
-    transform: translateY(0);
+    transform: translateY(1px);
 }
 
-.btn-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 15px;
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Button sizes */
+.btn-sm {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.85rem;
+}
+
+.btn-lg {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1.1rem;
+}
+
+/* Full width buttons on mobile */
+@media (max-width: 480px) {
+    .btn {
+        width: 100%;
+        margin-top: var(--spacing-xs);
+    }
+    
+    .btn + .btn {
+        margin-left: 0;
+    }
 }
 
 /* Names List */
@@ -218,102 +454,134 @@ textarea:focus {
     margin-bottom: 10px;
 }
 
+/* Scrollable Areas */
+.scrollable-list,
+.tasks-list,
+.history-list {
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+    overscroll-behavior: contain; /* Prevent scroll chaining */
+}
+
+.scrollable-list::-webkit-scrollbar,
+.tasks-list::-webkit-scrollbar,
+.history-list::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.scrollable-list::-webkit-scrollbar-thumb,
+.tasks-list::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 3px;
+}
+
+.scrollable-list::-webkit-scrollbar-track,
+.tasks-list::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
+/* Fix for iOS scrolling */
 .scrollable-list {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    padding: 10px;
-    background: var(--bg);
+    -webkit-overflow-scrolling: touch;
 }
 
-.name-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 8px;
-    background: var(--card-bg);
-    border-radius: 6px;
-    box-shadow: 0 2px 4px var(--shadow);
+/* Prevent text size adjustment on orientation change */
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
 }
 
-/* Tasks List */
-.tasks-container h3 {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
+/* Fix for iOS form elements */
+input[type="text"],
+input[type="date"],
+textarea,
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0;
 }
 
-.tasks-list {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    padding: 10px;
-    background: var(--bg);
-}
-
-.task-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 8px;
-    background: var(--card-bg);
-    border-radius: 6px;
-    box-shadow: 0 2px 4px var(--shadow);
-}
-
-.task-item input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-.select-all {
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.name-item .delete-btn {
-    background: var(--danger);
-    color: white;
+/* Fix for iOS button styling */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
+    background: none;
+    font-family: inherit;
     cursor: pointer;
-    font-size: 0.9rem;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.name-item .delete-btn:hover {
-    opacity: 0.8;
+/* Touch-friendly elements */
+button, 
+a, 
+input, 
+select, 
+textarea, 
+label {
+    touch-action: manipulation;
+}
+
+/* Prevents iOS text size adjust after orientation change */
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+/* Fix for iOS zoom on input focus */
+@supports (-webkit-touch-callout: none) {
+    /* CSS specific to iOS devices */
+    input, textarea, select {
+        font-size: 16px !important;
+    }
 }
 
 /* Game Grid */
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--spacing-md);
+    width: 100%;
 }
 
 .game-btn {
     background: linear-gradient(135deg, var(--secondary), var(--primary));
     color: white;
     border: none;
-    padding: 30px 20px;
-    border-radius: 12px;
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s ease;
     text-align: center;
     font-size: 1rem;
     font-weight: 600;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    min-height: 120px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    -webkit-tap-highlight-color: transparent;
 }
 
-.game-btn .emoji {
-    font-size: 2.5rem;
-}
-
+/* Improve touch targets */
 .game-btn:hover {
     transform: scale(1.05) rotate(2deg);
     box-shadow: 0 8px 16px var(--shadow);
