@@ -42,6 +42,7 @@ const UIController = {
             namesList: document.getElementById('namesList'),
             saveNamesBtn: document.getElementById('saveNamesBtn'),
             clearNamesBtn: document.getElementById('clearNamesBtn'),
+            assignToSelect: document.getElementById('assignToSelect'), // Added for task assignment
 
             // Task management
             taskInput: document.getElementById('taskInput'),
@@ -101,7 +102,14 @@ const UIController = {
         this.elements.roleRouletteBtn.addEventListener('click', () => this.runGame(GameEngine.roleRoulette.bind(GameEngine)));
         this.elements.secretSantaBtn.addEventListener('click', () => this.runGame(GameEngine.secretSanta.bind(GameEngine)));
         this.elements.birthdayCheckBtn.addEventListener('click', () => this.runGame(GameEngine.checkBirthdays.bind(GameEngine)));
-        this.elements.assignTaskBtn.addEventListener('click', () => this.runGame(GameEngine.assignTaskToRandomPerson.bind(GameEngine)));
+        this.elements.assignTaskBtn.addEventListener('click', () => {
+            const selectedPerson = this.elements.assignToSelect.value;
+            if (selectedPerson && selectedPerson !== 'random') {
+                this.runGame(() => GameEngine.assignTaskToPerson(selectedPerson));
+            } else {
+                this.runGame(GameEngine.assignTaskToRandomPerson);
+            }
+        });
         this.elements.chaosBtn.addEventListener('click', () => this.runGame(GameEngine.chaosButton.bind(GameEngine)));
 
         // Result actions
@@ -168,7 +176,7 @@ const UIController = {
      * Handle save names button
      */
     handleSaveNames() {
-        this.showNotification('✅ Names saved!');
+        this.showNotification(' Names saved!');
     },
 
     /**
@@ -194,7 +202,7 @@ const UIController = {
         // Clear selected tasks when tasks are updated
         DataManager.saveSelectedTasks([]);
         this.renderTasks();
-        this.showNotification('✅ Tasks saved!');
+        this.showNotification(' Tasks saved!');
     },
 
     /**
@@ -278,7 +286,7 @@ const UIController = {
     handleCopy() {
         if (this.currentResult) {
             navigator.clipboard.writeText(this.currentResult.result).then(() => {
-                this.showNotification('📋 Copied to clipboard!');
+                this.showNotification(' Copied to clipboard!');
             });
         }
     },
@@ -288,22 +296,44 @@ const UIController = {
      */
     renderNamesList() {
         const names = DataManager.getNames();
-        const birthdates = DataManager.getBirthdates();
+        const namesList = this.elements.namesList;
+        const assignToSelect = this.elements.assignToSelect;
+        
+        // Clear and update names list
+        namesList.innerHTML = '';
+        
+        // Update assign to dropdown
+        assignToSelect.innerHTML = '<option value="random">Random Person</option>';
 
         if (names.length === 0) {
-            this.elements.namesList.innerHTML = '<p style="text-align: center; color: #7F8C8D;">No names yet. Add some!</p>';
+            namesList.innerHTML = '<div class="empty-state">No tribe members added yet. Add some above!</div>';
             return;
         }
 
-        this.elements.namesList.innerHTML = names.map(name => {
-            const bd = birthdates[name] ? ` 🎂 ${birthdates[name]}` : '';
-            return `
-                <div class="name-item">
-                    <span>${name}${bd}</span>
-                    <button class="delete-btn" onclick="UIController.deleteName('${name}')">✕</button>
-                </div>
+        names.forEach(name => {
+            // Add to names list
+            const item = document.createElement('div');
+            item.className = 'name-item';
+            item.innerHTML = `
+                <span>${name}</span>
+                <button class="delete-btn" data-name="${name}">×</button>
             `;
-        }).join('');
+            namesList.appendChild(item);
+            
+            // Add to assign to dropdown
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            assignToSelect.appendChild(option);
+        });
+
+        // Add delete event listeners
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteName(btn.dataset.name);
+            });
+        });
     },
 
     /**

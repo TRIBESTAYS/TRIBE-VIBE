@@ -261,36 +261,46 @@ const GameEngine = {
             game: 'Birthday Check'
         };
     },
+    
+    /**
+     * Assign a random task to a specific person
+     * @param {string} person - The person to assign the task to
+     * @returns {Object} - {success: boolean, result: string}
+     */
+    assignTaskToPerson(person) {
+        const tasks = DataManager.getSelectedTasks();
+        
+        if (tasks.length === 0) {
+            return { success: false, result: 'No tasks available! Add some tasks first.' };
+        }
 
+        const task = DataManager.pickRandom(tasks);
+        
+        return {
+            success: true,
+            result: `🎯 ${person} has been assigned a task!\n\n📝 Task: ${task}`,
+            game: 'Task Assigned'
+        };
+    },
+    
     /**
      * Assign a random task to a random person
      * @returns {Object} - {success: boolean, result: string}
      */
     assignTaskToRandomPerson() {
         const names = DataManager.getNames();
-        const tasks = DataManager.getSelectedTasks();
-
+        
         if (names.length === 0) {
             return { success: false, result: 'No names available! Add some tribe members first.' };
         }
-        if (tasks.length === 0) {
-            return { success: false, result: 'No tasks available! Add some tasks first.' };
-        }
-
-        const person = DataManager.pickRandom(names);
-        const task = DataManager.pickRandom(tasks);
         
-        return {
-            success: true,
-            result: `🎯 ${person} has been assigned a task!\n\n📝 Task: ${task}`,
-            game: 'Assign Task to Random Person'
-        };
+        const person = DataManager.pickRandom(names);
+        return this.assignTaskToPerson(person);
     },
-
+    
     /**
-     * CHAOS BUTTON - runs a random game
-     * Ensures variety by not repeating last game
-     * @returns {Object} - Result from random game
+     * Chaos button - randomly selects and runs a game
+     * @returns {Object} - Result of the selected game
      */
     chaosButton() {
         const games = [
@@ -300,7 +310,7 @@ const GameEngine = {
             'whosMostLikelyTo',
             'roleRoulette',
             'assignTaskToRandomPerson',
-            'roleRoulette'
+            'secretSanta'
         ];
 
         // Filter out last game if possible

@@ -324,6 +324,32 @@ textarea:focus {
     animation: pulse 2s infinite;
 }
 
+/* Assign Task Container */
+.assign-task-container {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.assign-select {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.assign-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
 /* Result Card */
 .result-card {
     animation: slideIn 0.5s ease-out;
