@@ -57,6 +57,7 @@ const UIController = {
             roleRouletteBtn: document.getElementById('roleRouletteBtn'),
             secretSantaBtn: document.getElementById('secretSantaBtn'),
             birthdayCheckBtn: document.getElementById('birthdayCheckBtn'),
+            assignTaskBtn: document.getElementById('assignTaskBtn'),
             chaosBtn: document.getElementById('chaosBtn'),
 
             // Result display
@@ -93,14 +94,15 @@ const UIController = {
         this.elements.selectAllTasks.addEventListener('change', () => this.handleSelectAllTasks());
 
         // Game buttons
-        this.elements.randomPersonBtn.addEventListener('click', () => this.runGame(() => GameEngine.pickRandomPersonAndTask()));
-        this.elements.shufflePairsBtn.addEventListener('click', () => this.runGame(() => GameEngine.shufflePairs()));
-        this.elements.chaosTeamsBtn.addEventListener('click', () => this.runGame(() => GameEngine.chaosTeams()));
-        this.elements.mostLikelyBtn.addEventListener('click', () => this.runGame(() => GameEngine.whosMostLikelyTo()));
-        this.elements.roleRouletteBtn.addEventListener('click', () => this.runGame(() => GameEngine.roleRoulette()));
-        this.elements.secretSantaBtn.addEventListener('click', () => this.runGame(() => GameEngine.secretSanta()));
-        this.elements.birthdayCheckBtn.addEventListener('click', () => this.runGame(() => GameEngine.checkBirthdays()));
-        this.elements.chaosBtn.addEventListener('click', () => this.runGame(() => GameEngine.chaosButton()));
+        this.elements.randomPersonBtn.addEventListener('click', () => this.runGame(GameEngine.pickRandomPersonAndTask.bind(GameEngine)));
+        this.elements.shufflePairsBtn.addEventListener('click', () => this.runGame(GameEngine.shufflePairs.bind(GameEngine)));
+        this.elements.chaosTeamsBtn.addEventListener('click', () => this.runGame(GameEngine.chaosTeams.bind(GameEngine)));
+        this.elements.mostLikelyBtn.addEventListener('click', () => this.runGame(GameEngine.whosMostLikelyTo.bind(GameEngine)));
+        this.elements.roleRouletteBtn.addEventListener('click', () => this.runGame(GameEngine.roleRoulette.bind(GameEngine)));
+        this.elements.secretSantaBtn.addEventListener('click', () => this.runGame(GameEngine.secretSanta.bind(GameEngine)));
+        this.elements.birthdayCheckBtn.addEventListener('click', () => this.runGame(GameEngine.checkBirthdays.bind(GameEngine)));
+        this.elements.assignTaskBtn.addEventListener('click', () => this.runGame(GameEngine.assignTaskToRandomPerson.bind(GameEngine)));
+        this.elements.chaosBtn.addEventListener('click', () => this.runGame(GameEngine.chaosButton.bind(GameEngine)));
 
         // Result actions
         this.elements.rerunBtn.addEventListener('click', () => this.handleRerun());
