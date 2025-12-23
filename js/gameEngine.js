@@ -299,7 +299,7 @@ const GameEngine = {
     },
     
     /**
-     * Spotlight appreciation - highlight a random team member
+     * Spotlight appreciation - highlight a random team member with specific appreciation
      * @returns {Object} - {success: boolean, result: string}
      */
     spotlightAppreciation() {
@@ -309,17 +309,41 @@ const GameEngine = {
         }
         
         const person = DataManager.pickRandom(names);
-        const appreciations = [
-            `🌟 Shoutout to ${person} for being amazing! 🌟`,
-            `👏 Let's give it up for ${person} - you rock! 👏`,
-            `💫 ${person}, the team appreciates all you do! 💫`,
-            `🎉 Big thanks to ${person} for being awesome! 🎉`,
-            `✨ ${person}, your contributions don't go unnoticed! ✨`
+        const appreciationPrompts = [
+            `for helping someone recently when they needed it most`,
+            `for consistently going above and beyond`,
+            `for that small but important win yesterday`,
+            `for bringing such positive energy to the team`,
+            `for their creative solution to a tough problem`,
+            `for always being willing to lend a hand`,
+            `for their attention to detail that never goes unnoticed`,
+            `for making the workplace more enjoyable for everyone`,
+            `for their patience and guidance when others need help`,
+            `for always staying calm under pressure`,
+            `for their innovative ideas that push us forward`,
+            `for being a great listener and team player`,
+            `for their dedication to continuous improvement`,
+            `for making complex things seem simple`,
+            `for their positive attitude, even on tough days`
         ];
+        
+        const appreciationTypes = [
+            '🌟 SHOUTOUT',
+            '👏 RECOGNITION',
+            '💫 APPRECIATION',
+            '🎉 CELEBRATION',
+            '✨ RECOGNITION',
+            '🙌 KUDOS',
+            '🏆 ACCOLADE',
+            '💖 THANK YOU'
+        ];
+        
+        const prompt = DataManager.pickRandom(appreciationPrompts);
+        const appreciationType = DataManager.pickRandom(appreciationTypes);
         
         return {
             success: true,
-            result: `🎤 SPOTLIGHT APPRECIATION!\n\n${DataManager.pickRandom(appreciations)}`,
+            result: `${appreciationType} SPOTLIGHT!\n\n${person},\n\nWe want to recognize you ${prompt}.\n\nYour contributions make a real difference!`,
             game: 'Spotlight Appreciation'
         };
     },
@@ -391,6 +415,41 @@ const GameEngine = {
     },
 
     /**
+     * Buddy Switch - Create random buddy pairs for the day
+     * @returns {Object} - {success: boolean, result: string}
+     */
+    buddySwitch() {
+        const names = DataManager.getNames();
+
+        if (names.length < 2) {
+            return { success: false, result: 'Need at least 2 people for Buddy Switch!' };
+        }
+
+        const shuffled = DataManager.shuffle(names);
+        const pairs = [];
+        const today = new Date().toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        for (let i = 0; i < shuffled.length; i += 2) {
+            if (i + 1 < shuffled.length) {
+                pairs.push(`🤝 ${shuffled[i]} ↔ ${shuffled[i + 1]}`);
+            } else {
+                pairs.push(`🃏 ${shuffled[i]} (Wildcard Buddy)`);
+            }
+        }
+
+        return {
+            success: true,
+            result: `🧑‍🤝‍🧑 BUDDY SWITCH (${today})\n\n${pairs.join('\n')}\n\nRule:\nHelp your buddy once today. No lifelong obligations.`,
+            game: 'Buddy Switch'
+        };
+    },
+
+    /**
      * Chaos button - smartly selects and runs a game based on context
      * @returns {Object} - Result of the selected game
      */
@@ -410,7 +469,8 @@ const GameEngine = {
             'spotlightAppreciation',
             'standupRoulette',
             'opinionSplit',
-            'timeBoxChallenge'
+            'timeBoxChallenge',
+            'buddySwitch'
         ];
 
         // Morning games (before 12pm)

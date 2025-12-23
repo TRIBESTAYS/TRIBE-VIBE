@@ -57,6 +57,7 @@ const UIController = {
             mostLikelyBtn: document.getElementById('mostLikelyBtn'),
             roleRouletteBtn: document.getElementById('roleRouletteBtn'),
             secretSantaBtn: document.getElementById('secretSantaBtn'),
+            buddySwitchBtn: document.getElementById('buddySwitchBtn'),
             birthdayCheckBtn: document.getElementById('birthdayCheckBtn'),
             assignTaskBtn: document.getElementById('assignTaskBtn'),
             chaosBtn: document.getElementById('chaosBtn'),
@@ -101,6 +102,7 @@ const UIController = {
         this.elements.mostLikelyBtn.addEventListener('click', () => this.runGame(GameEngine.whosMostLikelyTo.bind(GameEngine)));
         this.elements.roleRouletteBtn.addEventListener('click', () => this.runGame(GameEngine.roleRoulette.bind(GameEngine)));
         this.elements.secretSantaBtn.addEventListener('click', () => this.runGame(GameEngine.secretSanta.bind(GameEngine)));
+        this.elements.buddySwitchBtn.addEventListener('click', () => this.runGame(GameEngine.buddySwitch.bind(GameEngine)));
         this.elements.birthdayCheckBtn.addEventListener('click', () => this.runGame(GameEngine.checkBirthdays.bind(GameEngine)));
         this.elements.assignTaskBtn.addEventListener('click', () => {
             const selectedPerson = this.elements.assignToSelect.value;
