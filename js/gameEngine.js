@@ -157,39 +157,253 @@ const GameEngine = {
     },
 
     /**
-     * Assign random roles to everyone
+     * Get the current game mode based on time and day
+     * @returns {string} - Current game mode
+     */
+    getRoleRouletteMode() {
+        const hour = new Date().getHours();
+        const day = new Date().getDay();
+        
+        // Friday afternoon is chaos time!
+        if (day === 5 && hour >= 14) return 'friday';
+        
+        // Morning meetings are more structured
+        if (hour < 12) return 'meeting';
+        
+        // Afternoons are for creativity
+        if (hour < 17) return 'brainstorm';
+        
+        // Default to meeting mode
+        return 'meeting';
+    },
+
+    /**
+     * Get role prompts for better engagement
+     * @param {string} role - The role to get prompt for
+     * @returns {string} - The role prompt
+     */
+    getRolePrompt(role) {
+        const prompts = {
+            // Anchor roles
+            '🧭 Moderator': 'Keep the discussion on track and ensure everyone is heard',
+            '⏱️ Timekeeper': 'Gently nudge when time is running short',
+            '📝 Scribe': 'Take notes on key decisions and action items',
+            '👥 Facilitator': 'Encourage participation from everyone',
+            
+            // Execution roles
+            '🎯 Task Master': 'Identify and track one key action item',
+            '⚙️ Fixer': 'Find and solve one small problem today',
+            '📊 Data Analyst': 'Share one interesting data point',
+            '🔍 Quality Assurance': 'Spot one area for improvement',
+            
+            // Creativity roles
+            '🎨 Creative Lead': 'Suggest one unconventional idea today',
+            '💡 Idea Generator': 'Propose one "what if" scenario',
+            '🎭 Storyteller': 'Share a relevant story or analogy',
+            '✨ Innovation Scout': 'Find one thing we can improve',
+            
+            // Communication roles
+            '📢 Hype Person': 'Celebrate at least one win today',
+            '🗣️ Spokesperson': 'Summarize key points clearly',
+            '👂 Active Listener': 'Paraphrase what someone else said',
+            '📝 Note Taker': 'Document one key insight',
+            
+            // Chaos roles
+            '🤡 Chaos Agent': 'Challenge one assumption',
+            '🃏 Wildcard': 'Ask one unexpected question',
+            '🎲 Risk Taker': 'Suggest one bold move',
+            '🔥 Rule Breaker': 'Propose breaking one small rule',
+            
+            // Observation roles
+            '🕵️ Watcher': 'Notice one pattern in the discussion',
+            '🔍 Detail Spotter': 'Point out one important detail',
+            '🧐 Process Observer': 'Suggest one process improvement',
+            '📈 Trend Analyst': 'Identify one emerging trend'
+        };
+        
+        return prompts[role] || 'Make the most of this role!';
+    },
+
+    /**
+     * Get role history for a person to avoid repetition
+     * @param {string} name - The person's name
+     * @returns {Array} - Array of recent roles
+     */
+    getRoleHistory(name) {
+        const history = localStorage.getItem(`role_history_${name}`);
+        return history ? JSON.parse(history) : [];
+    },
+
+    /**
+     * Update role history for a person
+     * @param {string} name - The person's name
+     * @param {string} role - The role to add to history
+     */
+    updateRoleHistory(name, role) {
+        const history = this.getRoleHistory(name);
+        // Keep only the last 5 roles to prevent history from growing too large
+        const updatedHistory = [role, ...history].slice(0, 5);
+        localStorage.setItem(`role_history_${name}`, JSON.stringify(updatedHistory));
+    },
+
+    /**
+     * Assign random roles to everyone with categories, time limits, and prompts
      * @returns {Object} - {success: boolean, result: string}
      */
     roleRoulette() {
         const names = DataManager.getNames();
-        const roles = [
-            '👑 Leader',
-            '🎨 Creative Director',
-            '🤡 Chaos Agent',
-            '🧠 Strategist',
-            '😎 Vibe Curator',
-            '📢 Hype Person',
-            '🕵️ Secret Agent',
-            '🎭 Drama Queen/King',
-            '🎯 Task Master',
-            '💡 Idea Generator'
-        ];
+        const mode = this.getRoleRouletteMode();
+        
+        // Define roles by category
+        const rolesByCategory = {
+            Execution: ['🎯 Task Master', '⚙️ Fixer', '� Data Analyst', '� Quality Assurance'],
+            Creativity: ['🎨 Creative Lead', '💡 Idea Generator', '🎭 Storyteller', '✨ Innovation Scout'],
+            Communication: ['� Hype Person', '🗣️ Spokesperson', '👂 Active Listener', '📝 Note Taker'],
+            Chaos: ['🤡 Chaos Agent', '🃏 Wildcard', '🎲 Risk Taker', '� Rule Breaker'],
+            Observation: ['�️ Watcher', '🔍 Detail Spotter', '🧐 Process Observer', '� Trend Analyst']
+        };
 
+        // Anchor roles (one per round)
+        const anchorRoles = ['🧭 Moderator', '⏱️ Timekeeper', '📝 Scribe', '👥 Facilitator'];
+        
+        // Time limits for roles
+        const durations = ['10 minutes', '30 minutes', '1 hour', 'this meeting', 'today'];
+        
         if (names.length === 0) {
             return { success: false, result: 'No names available! Add some tribe members first.' };
         }
 
-        const shuffledRoles = DataManager.shuffle(roles);
-        const assignments = names.map((name, idx) => {
-            const role = shuffledRoles[idx % shuffledRoles.length];
-            return `${name} → ${role}`;
-        });
+        // Get a shuffled copy of names
+        const shuffledNames = DataManager.shuffle([...names]);
+        
+        // Filter categories based on mode
+        let availableCategories = { ...rolesByCategory };
+        if (mode === 'meeting') {
+            // Remove Chaos category for meetings
+            const { Chaos, ...filteredCategories } = availableCategories;
+            availableCategories = filteredCategories;
+        } else if (mode === 'brainstorm') {
+            // Emphasize creativity
+            availableCategories = {
+                Creativity: rolesByCategory.Creativity,
+                Communication: rolesByCategory.Communication,
+                Observation: rolesByCategory.Observation
+            };
+        } else if (mode === 'friday') {
+            // Allow all categories, including Chaos
+            availableCategories = { ...rolesByCategory };
+        }
+
+        const assignments = [];
+        const usedRoles = new Set();
+        
+        // Assign the anchor role first
+        const anchorRole = this.getUniqueRole(anchorRoles, usedRoles, shuffledNames[0]);
+        const anchorDuration = DataManager.pickRandom(durations);
+        const anchorPrompt = this.getRolePrompt(anchorRole);
+        this.updateRoleHistory(shuffledNames[0], anchorRole);
+        
+        assignments.push(
+            `🎯 ${shuffledNames[0]}`,
+            `   ${anchorRole} (⏳ ${anchorDuration})`,
+            `   💡 ${anchorPrompt}`,
+            ''
+        );
+        
+        // Assign roles to remaining people
+        for (let i = 1; i < shuffledNames.length; i++) {
+            const name = shuffledNames[i];
+            const roleHistory = this.getRoleHistory(name);
+            
+            // Get all available roles from all categories
+            let allAvailableRoles = [];
+            Object.values(availableCategories).forEach(roles => {
+                allAvailableRoles = [...allAvailableRoles, ...roles];
+            });
+            
+            // Filter out recently used roles for this person
+            const availableRoles = allAvailableRoles.filter(
+                role => !roleHistory.includes(role) && !usedRoles.has(role)
+            );
+            
+            // If no roles left (unlikely), allow any role except the ones already used
+            const rolePool = availableRoles.length > 0 
+                ? availableRoles 
+                : allAvailableRoles.filter(role => !usedRoles.has(role));
+            
+            if (rolePool.length === 0) {
+                // If we've somehow run out of roles, reset used roles
+                usedRoles.clear();
+            }
+            
+            const role = DataManager.pickRandom(rolePool);
+            usedRoles.add(role);
+            
+            const duration = DataManager.pickRandom(durations);
+            const prompt = this.getRolePrompt(role);
+            
+            // Update role history
+            this.updateRoleHistory(name, role);
+            
+            assignments.push(
+                `🎭 ${name}`,
+                `   ${role} (⏳ ${duration})`,
+                `   💡 ${prompt}`,
+                ''
+            );
+        }
+
+        // Add mode-specific description
+        let description = '';
+        switch(mode) {
+            case 'meeting':
+                description = '📅 MEETING MODE: Structured roles for productive discussions';
+                break;
+            case 'brainstorm':
+                description = '💡 BRAINSTORM MODE: Creative roles for idea generation';
+                break;
+            case 'friday':
+                description = '🎉 FRIDAY MODE: Anything goes! (Chaos enabled)';
+                break;
+            default:
+                description = '🎮 ROLE ROULETTE: Let the games begin!';
+        }
+
+        // Get the duration for the session (longest duration among assigned roles)
+        const duration = '30 minutes'; // Default duration
+        
+        // Format the role assignments in the new style
+        const formattedAssignments = [
+            `\n${description} (⏳ ${duration})\n`,
+            ...shuffledNames.map((name, index) => {
+                const roleLine = assignments.find(line => line.startsWith(`🎭 ${name}`) || line.startsWith(`🎯 ${name}`));
+                const role = roleLine ? roleLine.split('(')[0].trim() : '';
+                const roleName = role.replace(/^[^\w\s]*\s*/, ''); // Remove emoji and leading space
+                const roleEmoji = role.match(/^[^\w\s]*/)[0] || '🎭';
+                return `${name} — ${roleEmoji} ${roleName}`;
+            }),
+            '\n🔄 ROLE SWAP RULE: Anyone can request ONE role swap per session by explaining why.',
+            '   (This encourages better role fit and team communication!)',
+            '\n💡 TIP: Fulfill your role\'s purpose during the specified time!'        ];
 
         return {
             success: true,
-            result: `🎭 Role Roulette:\n\n${assignments.join('\n')}`,
+            result: `🎭 ROLE ASSIGNMENTS\n${formattedAssignments.join('\n')}`,
             game: 'Role Roulette'
         };
+    },
+
+    /**
+     * Get a unique role for a person
+     * @param {Array} roles - The roles to choose from
+     * @param {Set} usedRoles - The roles already used
+     * @param {string} name - The person's name
+     * @returns {string} - The unique role
+     */
+    getUniqueRole(roles, usedRoles, name) {
+        const roleHistory = this.getRoleHistory(name);
+        const availableRoles = roles.filter(role => !roleHistory.includes(role) && !usedRoles.has(role));
+        return DataManager.pickRandom(availableRoles);
     },
 
     /**
