@@ -299,20 +299,129 @@ const GameEngine = {
     },
     
     /**
-     * Chaos button - randomly selects and runs a game
+     * Spotlight appreciation - highlight a random team member
+     * @returns {Object} - {success: boolean, result: string}
+     */
+    spotlightAppreciation() {
+        const names = DataManager.getNames();
+        if (names.length === 0) {
+            return { success: false, result: 'No names available! Add some tribe members first.' };
+        }
+        
+        const person = DataManager.pickRandom(names);
+        const appreciations = [
+            `🌟 Shoutout to ${person} for being amazing! 🌟`,
+            `👏 Let's give it up for ${person} - you rock! 👏`,
+            `💫 ${person}, the team appreciates all you do! 💫`,
+            `🎉 Big thanks to ${person} for being awesome! 🎉`,
+            `✨ ${person}, your contributions don't go unnoticed! ✨`
+        ];
+        
+        return {
+            success: true,
+            result: `🎤 SPOTLIGHT APPRECIATION!\n\n${DataManager.pickRandom(appreciations)}`,
+            game: 'Spotlight Appreciation'
+        };
+    },
+
+    /**
+     * Standup roulette - pick someone to start standup
+     * @returns {Object} - {success: boolean, result: string}
+     */
+    standupRoulette() {
+        const names = DataManager.getNames();
+        if (names.length === 0) {
+            return { success: false, result: 'No names available! Add some tribe members first.' };
+        }
+        
+        const person = DataManager.pickRandom(names);
+        return {
+            success: true,
+            result: `🎤 STANDUP ROUND-UP!\n\n${person} is up first! Share your updates, then pick the next person!`,
+            game: 'Standup Roulette'
+        };
+    },
+
+    /**
+     * Opinion split - force the team to pick a side
+     * @returns {Object} - {success: boolean, result: string}
+     */
+    opinionSplit() {
+        const opinions = [
+            'Pineapple on pizza: Delicious or crime against humanity?',
+            'Tabs vs. Spaces: The eternal debate',
+            'Toilet paper: Over or under?',
+            'Is a hot dog a sandwich?',
+            'Should the toilet seat stay up or down?',
+            'Ketchup on eggs: Yes or no?',
+            'Is cereal a soup?',
+            'Does the toilet paper go over or under?'
+        ];
+        
+        const opinion = DataManager.pickRandom(opinions);
+        return {
+            success: true,
+            result: `🤔 OPINION SPLIT!\n\n${opinion}\n\nTeam, where do you stand?`,
+            game: 'Opinion Split'
+        };
+    },
+
+    /**
+     * Time-Box Challenge - Assigns a random task with a time limit
+     * @returns {Object} - {success: boolean, result: string}
+     */
+    timeBoxChallenge() {
+        const tasks = DataManager.getSelectedTasks();
+        if (tasks.length === 0) {
+            return { success: false, result: 'No tasks available! Add some tasks first.' };
+        }
+        
+        const task = DataManager.pickRandom(tasks);
+        const times = ['15 minutes', '30 minutes', '45 minutes'];
+        const time = DataManager.pickRandom(times);
+        
+        const challengeEmojis = ['⏱️', '⏳', '⏰', '⌛', '🕒'];
+        const emoji = DataManager.pickRandom(challengeEmojis);
+        
+        return {
+            success: true,
+            result: `${emoji} TIME-BOX CHALLENGE!\n\n📋 Task: ${task}\n⏱️ Time limit: ${time}\n\nReady... Set... Go!`,
+            game: 'Time-Box Challenge'
+        };
+    },
+
+    /**
+     * Chaos button - smartly selects and runs a game based on context
      * @returns {Object} - Result of the selected game
      */
     chaosButton() {
-        const games = [
+        const hour = new Date().getHours();
+        const day = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        
+        // Base games available
+        let games = [
             'pickRandomPersonAndTask',
             'shufflePairs',
             'chaosTeams',
             'whosMostLikelyTo',
             'roleRoulette',
             'assignTaskToRandomPerson',
-            'secretSanta'
+            'secretSanta',
+            'spotlightAppreciation',
+            'standupRoulette',
+            'opinionSplit',
+            'timeBoxChallenge'
         ];
 
+        // Morning games (before 12pm)
+        if (hour < 12) {
+            games = ['standupRoulette', 'spotlightAppreciation'];
+        }
+        // Friday games (more team-focused)
+        else if (day === 5) { // Friday
+            games = ['chaosTeams', 'roleRoulette', 'opinionSplit'];
+        }
+        
         // Filter out last game if possible
         const availableGames = games.filter(g => g !== this.lastGame);
         const gameToPlay = availableGames.length > 0 
